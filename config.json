@@ -4,7 +4,7 @@
     "ask": true,
     "ability": true,
     "mil": true,
-    "superbot": false,
+    "superbot": true,
     "rodis": true
   },
   "cases": {
