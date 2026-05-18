@@ -478,5 +478,118 @@ var obs = new IntersectionObserver(function(entries) {
 }, { threshold: 0.06 });
 document.querySelectorAll('.fade-in').forEach(function(el) { obs.observe(el); });
 </script>
+
+<script id="portfolio-config">
+(function() {
+  // Map page filename to config key and section
+  var PAGE_MAP = {
+    'iqc.html':          { section: 'products', key: 'iqc' },
+    'ask.html':          { section: 'products', key: 'ask' },
+    'ability.html':      { section: 'products', key: 'ability' },
+    'mil.html':          { section: 'products', key: 'mil' },
+    'superbot.html':     { section: 'products', key: 'superbot' },
+    'rodis.html':        { section: 'products', key: 'rodis' },
+    'tinysurprise.html': { section: 'cases',    key: 'tinysurprise' },
+    'oho.html':          { section: 'cases',    key: 'oho' },
+    'wwalks.html':       { section: 'cases',    key: 'wwalks' },
+    'myrenault.html':    { section: 'cases',    key: 'myrenault' },
+    'helloman.html':     { section: 'cases',    key: 'helloman' }
+  };
+
+  // All sidebar buttons that link to product/case pages
+  // data-page attribute is added to each sb-item via this script
+  function getPageFromOnclick(el) {
+    var oc = el.getAttribute('onclick') || '';
+    var m = oc.match(/location\.href=['"]([^'"]+)['"]/);
+    return m ? m[1] : null;
+  }
+
+  function applyConfig(cfg) {
+    var currentPage = window.location.pathname.split('/').pop() || 'index.html';
+
+    // 1. Redirect if current page is disabled
+    if (PAGE_MAP[currentPage]) {
+      var info = PAGE_MAP[currentPage];
+      var enabled = cfg[info.section] && cfg[info.section][info.key];
+      if (enabled === false) {
+        window.location.replace('index.html');
+        return;
+      }
+    }
+
+    // 2. Hide disabled items from sidebar
+    var sbItems = document.querySelectorAll('.sb-item');
+    sbItems.forEach(function(el) {
+      var page = getPageFromOnclick(el);
+      if (page && PAGE_MAP[page]) {
+        var info = PAGE_MAP[page];
+        var enabled = cfg[info.section] && cfg[info.section][info.key];
+        if (enabled === false) {
+          el.style.display = 'none';
+        }
+      }
+    });
+
+    // 3. Hide disabled cards on home page (index.html)
+    if (currentPage === 'index.html' || currentPage === '') {
+      // Product cards
+      var prodCards = document.querySelectorAll('.prod-card');
+      prodCards.forEach(function(el) {
+        var href = el.getAttribute('href') || '';
+        var page = href.split('/').pop();
+        if (page && PAGE_MAP[page]) {
+          var info = PAGE_MAP[page];
+          var enabled = cfg[info.section] && cfg[info.section][info.key];
+          if (enabled === false) {
+            el.style.display = 'none';
+          }
+        }
+      });
+
+      // Case cards
+      var caseCards = document.querySelectorAll('.case-card');
+      caseCards.forEach(function(el) {
+        var href = el.getAttribute('href') || '';
+        var page = href.split('/').pop();
+        if (page && PAGE_MAP[page]) {
+          var info = PAGE_MAP[page];
+          var enabled = cfg[info.section] && cfg[info.section][info.key];
+          if (enabled === false) {
+            el.style.display = 'none';
+          }
+        }
+      });
+    }
+  }
+
+  function loadConfig() {
+    var xhr = new XMLHttpRequest();
+    // Try relative path first (works on Vercel/GitHub Pages)
+    xhr.open('GET', '/config.json', true);
+    xhr.onload = function() {
+      if (xhr.status === 200) {
+        try {
+          var cfg = JSON.parse(xhr.responseText);
+          applyConfig(cfg);
+        } catch(e) {
+          console.warn('Portfolio config.json parse error:', e);
+        }
+      }
+    };
+    xhr.onerror = function() {
+      // Silently fail — all content visible if config unreachable
+      console.warn('Portfolio config.json not found — showing all content');
+    };
+    xhr.send();
+  }
+
+  // Run after DOM is ready
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', loadConfig);
+  } else {
+    loadConfig();
+  }
+})();
+</script>
 </body>
 </html>

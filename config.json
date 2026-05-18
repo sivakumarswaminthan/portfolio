@@ -1,0 +1,17 @@
+{
+  "products": {
+    "iqc": true,
+    "ask": true,
+    "ability": true,
+    "mil": true,
+    "superbot": true,
+    "rodis": false
+  },
+  "cases": {
+    "tinysurprise": true,
+    "oho": false,
+    "wwalks": true,
+    "myrenault": true,
+    "helloman": true
+  }
+}
