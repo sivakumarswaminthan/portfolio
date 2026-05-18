@@ -5,7 +5,7 @@
     "ability": true,
     "mil": true,
     "superbot": true,
-    "rodis": false
+    "rodis": true
   },
   "cases": {
     "tinysurprise": true,
